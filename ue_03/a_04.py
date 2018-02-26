@@ -136,8 +136,47 @@ def rkkoeff(name):
     return eval(name+'()')
 #    return eval(name)
 
-def rkskalar(f, x0, T, abc, h):
-    return np.array([[0, 0]]), [0]
+def rk(f, x0, T, abc, h):
+    s = np.shape(abc)[0]-1
+    A = abc[:s, 1:]
+    b = abc[s, 1:]
+    c = abc[:s, 0]
+
+    x0 = np.array(x0)
+    t_res = [T[0]]
+    x_res = [x0]
+
+    cur_t = T[0]
+
+    while cur_t < T[1]:
+        k = np.empty(shape=(s, np.shape(x0)[0]), dtype=np.float)
+
+        cur_x = x_res[-1]
+
+        # calculate the ks
+        i = 0
+        while i < s:
+
+            # calculate the inner sum
+            j = 0
+            sum = np.zeros(shape=(np.shape(x0)))
+            while j < i:
+                sum += A[i, j]*k[j, :]
+                j+=1
+
+            # set the current k
+            k[i] = f(x_res[-1]+h*sum,cur_t + c[i]*h)
+
+            # update phi
+            cur_x = cur_x + h * b[i] * k[i, :]
+
+            i+=1
+
+        x_res += [cur_x]
+        cur_t += h
+        t_res += [cur_t]
+    
+    return np.array(x_res), t_res
 
 if __name__ == '__main__':
 
@@ -148,15 +187,15 @@ if __name__ == '__main__':
     T = [0, 100]
     f = lambda x, t: a*x*(g-x)
 
-    x0 = 10
+    x0 = [10]
 
     x_odeint = odeint(f, x0, t)
 
     for plotnum, h in enumerate([20, 10, 5, 2, 1, 0.5]):
 
-        x_euler, t_euler = rkskalar(f, x0, T, rkkoeff('euler'), h)
-        x_collatz, t_collatz = rkskalar(f, x0, T, rkkoeff('collatz'), h)
-        x_rk4, t_rk4 = rkskalar(f, x0, T, rkkoeff('rk4'), h)
+        x_euler, t_euler = rk(f, x0, T, rkkoeff('euler'), h)
+        x_collatz, t_collatz = rk(f, x0, T, rkkoeff('collatz'), h)
+        x_rk4, t_rk4 = rk(f, x0, T, rkkoeff('rk4'), h)
 
         plt.subplot(2, 3, plotnum+1)
         plt.plot(t, x_odeint[:, 0])
