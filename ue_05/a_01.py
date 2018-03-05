@@ -16,7 +16,18 @@ from explmm import expLMM, ABcoeff
 
 if __name__ == '__main__':
 
-    for problem in ['a','b']:
+    for problem in ['a', 'b']:
+        if problem == 'c':
+            T = [0, 2]
+            f = lambda x, t: [t]
+            x0 = [0]
+            k = 2
+            A, B = ABcoeff(k)
+            x_res, t_res = expLMM(f, T, x0, k, A, B, 1)
+            print(t_res)
+            plt.plot(t_res, x_res)
+            plt.show()
+            
         if problem == 'a':
             t = np.arange(0, 100, 0.01)
 
@@ -72,7 +83,7 @@ if __name__ == '__main__':
             
             x_odeint = odeint(f, x0, t)
 
-            k = 3
+            k = 2
 
             A, B = ABcoeff(k)
 

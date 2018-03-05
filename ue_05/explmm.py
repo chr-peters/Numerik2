@@ -49,7 +49,7 @@ def expLMM(f, T, x0, k, A, B, h, method='adams'):
     x_res = np.array([x0])
     t_res = [T[0]]
     cur_t = T[0]
-    memory = np.array([f(x0, T[0])]) # memory of the k latest fi
+    memory = np.array([f(x0, T[0])], ndmin=1) # memory of the k latest fi
 
     # starting phase
     for i in range(1, k):
